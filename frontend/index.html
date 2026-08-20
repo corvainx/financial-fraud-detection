@@ -43,14 +43,26 @@
                 </div>
             </div>
 
-            <div class="flex items-center space-x-4">
+            <div class="flex items-center space-x-3">
+                <!-- Currency Switcher Dropdown (INR, USD, EUR, GBP) -->
+                <div class="flex items-center space-x-1.5 bg-slate-800/90 px-2.5 py-1 rounded-lg border border-slate-700">
+                    <i data-lucide="coins" class="w-3.5 h-3.5 text-indigo-400"></i>
+                    <label for="currencySelector" class="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Currency:</label>
+                    <select id="currencySelector" onchange="onCurrencyChange(this.value)" class="bg-transparent text-xs font-semibold text-white focus:outline-none cursor-pointer">
+                        <option value="INR" class="bg-slate-900 text-white">INR (₹)</option>
+                        <option value="USD" class="bg-slate-900 text-white" selected>USD ($)</option>
+                        <option value="EUR" class="bg-slate-900 text-white">EUR (€)</option>
+                        <option value="GBP" class="bg-slate-900 text-white">GBP (£)</option>
+                    </select>
+                </div>
+
                 <div id="modelBadge" class="hidden md:flex items-center space-x-2 text-xs bg-slate-800/80 px-3 py-1.5 rounded-full border border-slate-700">
                     <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
                     <span id="activeModelName" class="text-slate-300">Model: Initializing</span>
                 </div>
                 <a href="/docs" target="_blank" class="text-xs flex items-center gap-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded-lg border border-slate-700 transition">
                     <i data-lucide="file-code" class="w-3.5 h-3.5 text-slate-400"></i>
-                    <span>API Reference</span>
+                    <span class="hidden sm:inline">API Reference</span>
                 </a>
             </div>
         </div>
@@ -127,22 +139,22 @@
                     <!-- Preset Scenarios -->
                     <div class="mb-5">
                         <label class="text-xs font-medium text-slate-300 block mb-2">Preset Test Scenarios:</label>
-                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs" id="presetContainer">
                             <button type="button" onclick="loadPreset('coffee')" class="p-2.5 bg-slate-800/80 hover:bg-slate-700/80 text-slate-200 rounded-lg border border-slate-700/80 transition text-left">
                                 <span class="font-semibold block text-slate-200">Point of Sale</span>
-                                <span class="text-[10px] text-emerald-400">$4.50 Payment</span>
+                                <span class="text-[10px] text-emerald-400" id="presetCoffeeLabel">$4.50 Payment</span>
                             </button>
                             <button type="button" onclick="loadPreset('salary')" class="p-2.5 bg-slate-800/80 hover:bg-slate-700/80 text-slate-200 rounded-lg border border-slate-700/80 transition text-left">
                                 <span class="font-semibold block text-slate-200">Direct Deposit</span>
-                                <span class="text-[10px] text-emerald-400">$3,200 Cash-In</span>
+                                <span class="text-[10px] text-emerald-400" id="presetSalaryLabel">$3,200 Cash-In</span>
                             </button>
                             <button type="button" onclick="loadPreset('transfer')" class="p-2.5 bg-slate-800/80 hover:bg-slate-700/80 text-slate-200 rounded-lg border border-slate-700/80 transition text-left">
                                 <span class="font-semibold block text-slate-200">High Transfer</span>
-                                <span class="text-[10px] text-amber-400">$18,000 Volume</span>
+                                <span class="text-[10px] text-amber-400" id="presetTransferLabel">$18,000 Volume</span>
                             </button>
                             <button type="button" onclick="loadPreset('drain')" class="p-2.5 bg-slate-800/80 hover:bg-slate-700/80 text-slate-200 rounded-lg border border-slate-700/80 transition text-left">
                                 <span class="font-semibold block text-slate-200">Account Drain</span>
-                                <span class="text-[10px] text-rose-400">$95,000 (03:00 AM)</span>
+                                <span class="text-[10px] text-rose-400" id="presetDrainLabel">$95,000 (03:00 AM)</span>
                             </button>
                         </div>
                     </div>
@@ -161,29 +173,29 @@
                                 </select>
                             </div>
                             <div>
-                                <label class="text-xs font-medium text-slate-300">Amount (USD)</label>
+                                <label class="text-xs font-medium text-slate-300">Amount (<span class="currencySymbolDisplay">$</span>)</label>
                                 <input type="number" step="0.01" id="formAmount" required class="mt-1 w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:ring-1 focus:ring-indigo-500 focus:outline-none" value="95000.00">
                             </div>
                         </div>
 
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
-                                <label class="text-xs font-medium text-slate-300">Sender Balance Before ($)</label>
+                                <label class="text-xs font-medium text-slate-300">Sender Balance Before (<span class="currencySymbolDisplay">$</span>)</label>
                                 <input type="number" step="0.01" id="formOldOrig" required class="mt-1 w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:ring-1 focus:ring-indigo-500 focus:outline-none" value="95000.00">
                             </div>
                             <div>
-                                <label class="text-xs font-medium text-slate-300">Sender Balance After ($)</label>
+                                <label class="text-xs font-medium text-slate-300">Sender Balance After (<span class="currencySymbolDisplay">$</span>)</label>
                                 <input type="number" step="0.01" id="formNewOrig" required class="mt-1 w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:ring-1 focus:ring-indigo-500 focus:outline-none" value="0.00">
                             </div>
                         </div>
 
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
-                                <label class="text-xs font-medium text-slate-300">Receiver Balance Before ($)</label>
+                                <label class="text-xs font-medium text-slate-300">Receiver Balance Before (<span class="currencySymbolDisplay">$</span>)</label>
                                 <input type="number" step="0.01" id="formOldDest" required class="mt-1 w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:ring-1 focus:ring-indigo-500 focus:outline-none" value="0.00">
                             </div>
                             <div>
-                                <label class="text-xs font-medium text-slate-300">Receiver Balance After ($)</label>
+                                <label class="text-xs font-medium text-slate-300">Receiver Balance After (<span class="currencySymbolDisplay">$</span>)</label>
                                 <input type="number" step="0.01" id="formNewDest" required class="mt-1 w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:ring-1 focus:ring-indigo-500 focus:outline-none" value="0.00">
                             </div>
                         </div>
@@ -238,7 +250,7 @@
                             </div>
                         </div>
 
-                        <!-- Cybersecurity Indicators / Reasons -->
+                        <!-- Decision Factor Breakdown -->
                         <div>
                             <span class="text-xs font-medium text-slate-400 block mb-1.5">Decision Factor Breakdown:</span>
                             <div id="reasonsList" class="flex flex-wrap gap-2"></div>

@@ -5,6 +5,57 @@
 let decisionChartInstance = null;
 let riskDistChartInstance = null;
 
+// Currency Configuration (INR, USD, EUR, GBP)
+const CURRENCIES = {
+    INR: { symbol: '₹', code: 'INR', locale: 'en-IN' },
+    USD: { symbol: '$', code: 'USD', locale: 'en-US' },
+    EUR: { symbol: '€', code: 'EUR', locale: 'de-DE' },
+    GBP: { symbol: '£', code: 'GBP', locale: 'en-GB' }
+};
+
+let currentCurrency = localStorage.getItem('sentinel_currency') || 'USD';
+
+function formatCurrencyAmount(amount) {
+    const config = CURRENCIES[currentCurrency] || CURRENCIES.USD;
+    try {
+        const formatted = Number(amount).toLocaleString(config.locale, {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        });
+        return `${config.symbol}${formatted}`;
+    } catch (e) {
+        return `${config.symbol}${Number(amount).toFixed(2)}`;
+    }
+}
+
+function onCurrencyChange(currencyCode) {
+    if (!CURRENCIES[currencyCode]) return;
+    currentCurrency = currencyCode;
+    localStorage.setItem('sentinel_currency', currencyCode);
+    updateCurrencyDisplay();
+    fetchAuditLog();
+}
+
+function updateCurrencyDisplay() {
+    const config = CURRENCIES[currentCurrency] || CURRENCIES.USD;
+    const selector = document.getElementById('currencySelector');
+    if (selector) selector.value = currentCurrency;
+
+    document.querySelectorAll('.currencySymbolDisplay').forEach(el => {
+        el.textContent = config.symbol.trim();
+    });
+
+    const pCoffee = document.getElementById('presetCoffeeLabel');
+    const pSalary = document.getElementById('presetSalaryLabel');
+    const pTransfer = document.getElementById('presetTransferLabel');
+    const pDrain = document.getElementById('presetDrainLabel');
+
+    if (pCoffee) pCoffee.textContent = `${formatCurrencyAmount(4.50)} Payment`;
+    if (pSalary) pSalary.textContent = `${formatCurrencyAmount(3200.00)} Cash-In`;
+    if (pTransfer) pTransfer.textContent = `${formatCurrencyAmount(18000.00)} Volume`;
+    if (pDrain) pDrain.textContent = `${formatCurrencyAmount(95000.00)} (03:00 AM)`;
+}
+
 // Preset Scenarios for Testing
 const PRESETS = {
     coffee: {
@@ -301,7 +352,7 @@ async function fetchAuditLog() {
                 <td class="py-3 px-4 text-slate-400 font-mono">${timeStr}</td>
                 <td class="py-3 px-4 font-mono font-medium text-slate-200">${t.transaction_id}</td>
                 <td class="py-3 px-4 font-semibold text-slate-300">${t.type}</td>
-                <td class="py-3 px-4 font-mono font-bold text-white">$${t.amount.toLocaleString(undefined, {minimumFractionDigits: 2})}</td>
+                <td class="py-3 px-4 font-mono font-bold text-white">${formatCurrencyAmount(t.amount)}</td>
                 <td class="py-3 px-4 text-slate-400 font-mono">${t.name_orig} &rarr; ${t.name_dest}</td>
                 <td class="py-3 px-4">
                     <div class="flex items-center space-x-2">
@@ -330,6 +381,7 @@ document.getElementById('searchInput').addEventListener('input', () => {
 });
 
 window.addEventListener('DOMContentLoaded', () => {
+    updateCurrencyDisplay();
     fetchAnalytics();
     fetchAuditLog();
     lucide.createIcons();
