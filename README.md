@@ -1,41 +1,105 @@
-# AI-Based Financial Fraud Detection Platform
+# Financial Fraud Detection Platform
 
-An end-to-end cybersecurity and machine learning platform that detects and analyzes fraudulent financial transactions in real time.
+An AI-powered system that analyzes financial transactions in real time and flags or blocks fraudulent activity before money is lost.
+
+---
+
+## What Does This Project Do?
+
+When people transfer money online, banks need to know if the transaction is legitimate or if an attacker has compromised the account.
+
+Traditional security systems rely on rigid rules (like *"block anything over $10,000"*). Attackers easily bypass these rules by sending smaller amounts or moving money at unusual hours.
+
+This project solves that problem by using **Machine Learning**:
+
+1. A transaction enters the system (amount, sender balance, receiver balance, time).
+2. The AI model analyzes behavioral patterns (e.g., *Is the account suddenly emptied at 3 AM?*).
+3. The system assigns a **Fraud Risk Score** from **0% to 100%**.
+4. The system automatically makes an immediate cybersecurity decision:
+   - **APPROVE** (Risk < 30%): Safe transaction. Processed immediately.
+   - **FLAG** (Risk 30% – 75%): Suspicious. Triggers step-up security (like an OTP or MFA prompt).
+   - **BLOCK** (Risk > 75%): High probability of fraud. Transaction stopped immediately.
+5. The transaction and its decision are saved to a database and displayed on a live web dashboard.
+
+---
+
+## How It Works (The Core Pipeline)
 
 ```
-Incoming Transaction -> Data Preprocessing -> AI/ML Model -> Risk Score (0-100%) -> Decision -> Database -> Dashboard
+[Incoming Transaction]
+         │
+         ▼
+[Data Processing & Feature Extraction]
+  - Calculates balance discrepancies
+  - Checks if origin account was completely drained
+  - Checks if transaction occurred during abnormal hours (1 AM - 5 AM)
+         │
+         ▼
+[AI / Machine Learning Model]
+  - Scans historical patterns to evaluate fraud probability
+         │
+         ▼
+[Risk Score & Decision Engine]
+  - Score < 30%   ──> APPROVE (Legitimate)
+  - Score 30-75%  ──> FLAG (Ask for OTP / Review)
+  - Score > 75%   ──> BLOCK (Fraud Prevented)
+         │
+         ▼
+[Database & Web Dashboard]
+  - Saves transaction to audit log
+  - Updates analytics charts and KPI metrics in real time
 ```
 
 ---
 
-## System Architecture & Features
+## Quick Start (Run the Project)
 
-1. **Machine Learning Pipeline**:
-   - Compares **Logistic Regression**, **Random Forest**, and **Gradient Boosting** models.
-   - Evaluates performance using imbalanced classification metrics: **Precision, Recall, F1-Score, ROC-AUC, and PR-AUC**.
-   - Automatically saves and loads the best-performing pipeline.
+### 1. Prerequisites
+- Python 3.10, 3.11, or 3.12 installed.
 
-2. **Cybersecurity Domain Feature Engineering**:
-   - Origin and Destination Balance Error Tracking: `(new_balance + amount) - old_balance`
-   - Account Draining Anomaly Detection (identifies accounts completely emptied to zero)
-   - Off-Hours Activity Indicators (transactions initiated during abnormal hours)
-   - High-Value and Transfer Velocity Ratios
+### 2. Setup and Run
 
-3. **3-Tier Decision Engine**:
-   - **`APPROVE`** (Risk Score < 30%): Low risk, transaction approved.
-   - **`FLAG`** (30% <= Risk Score <= 75%): Moderate risk, requires step-up authentication (OTP/MFA) or manual review.
-   - **`BLOCK`** (Risk Score > 75%): High risk, immediate prevention.
+#### Linux (Fish Shell):
+```fish
+source venv/bin/activate.fish
+pip install -r requirements.txt
+python run.py
+```
 
-4. **FastAPI Backend & Database Layer**:
-   - RESTful API endpoints for single and batch predictions.
-   - Out-of-the-box **SQLite** database support (zero configuration required).
-   - Instant compatibility with **MySQL** via `.env` configuration.
-   - Auto-generated OpenAPI/Swagger documentation at `/docs`.
+#### Linux / macOS (Bash or Zsh):
+```bash
+source venv/bin/activate
+pip install -r requirements.txt
+python3 run.py
+```
 
-5. **Web Dashboard & Simulator**:
-   - **Live Transaction Simulator**: Test realistic financial scenarios with one-click presets.
-   - **Real-Time Risk Gauge**: Dynamic score visualization with risk reason indicators.
-   - **Analytics Charts**: Decision distribution, risk score histogram, and transaction audit log.
+#### Windows (PowerShell):
+```powershell
+.\venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+python run.py
+```
+
+#### Windows (Command Prompt):
+```cmd
+venv\Scripts\activate.bat
+pip install -r requirements.txt
+python run.py
+```
+
+---
+
+## Using the System
+
+Once `python run.py` is running, open your browser:
+
+### 1. Web Dashboard: [http://127.0.0.1:8000](http://127.0.0.1:8000)
+- **Transaction Simulator**: Choose a preset test scenario (like a normal $4.50 coffee payment vs. an abnormal $95,000 night-time account drain) or type custom numbers to see how the AI scores the transaction in real time.
+- **Analytics Charts**: View the live breakdown of approved, flagged, and blocked transactions.
+- **Audit Log Table**: View, filter, and search all historical transactions and their risk scores.
+
+### 2. API Documentation: [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
+- Interactive Swagger UI for developers to test the backend API endpoints directly.
 
 ---
 
@@ -43,213 +107,36 @@ Incoming Transaction -> Data Preprocessing -> AI/ML Model -> Risk Score (0-100%)
 
 ```
 fraud_det/
-├── data/
-│   └── raw/                      # Transaction datasets
+├── data/raw/                 # Historical transaction dataset
 ├── ml/
-│   ├── dataset_generator.py      # PaySim-style synthetic transaction generator
-│   ├── feature_engineering.py    # Domain feature extraction pipeline
-│   ├── evaluate.py               # Imbalanced evaluation metrics & confusion matrices
-│   ├── train.py                  # Model benchmark & training script
-│   └── artifacts/                # Saved model (.joblib) & metrics.json
+│   ├── dataset_generator.py  # Generates realistic transaction data
+│   ├── feature_engineering.py# Extracts fraud indicators (balance errors, time flags)
+│   ├── evaluate.py           # Calculates precision, recall, and F1-scores
+│   ├── train.py              # Trains and benchmarks classification models
+│   └── artifacts/            # Saved best-performing model file
 ├── backend/
 │   ├── app/
-│   │   ├── api/                  # FastAPI routers (predict, transactions, analytics, health)
-│   │   ├── core/                 # App configuration & database connection
-│   │   ├── models/               # SQLAlchemy database entities
-│   │   ├── schemas/              # Pydantic validation schemas
-│   │   └── services/             # Inference service & decision engine
-│   └── main.py                   # FastAPI application entry point
+│   │   ├── api/              # API endpoints for predictions and analytics
+│   │   ├── core/             # Configuration and database connection
+│   │   ├── models/           # Database table definitions
+│   │   └── services/         # Inference and decision logic
+│   └── main.py               # Backend server entry point
 ├── frontend/
-│   ├── index.html                # Web dashboard & transaction simulator UI
-│   ├── css/style.css             # Styling and themes
-│   └── js/app.js                 # Frontend API integration and Chart.js charts
+│   ├── index.html            # Web dashboard user interface
+│   ├── css/style.css         # Styling
+│   └── js/app.js             # Live chart and simulator logic
 ├── tests/
-│   └── test_pipeline.py          # Automated test suite
-├── requirements.txt              # Project dependencies
-├── run.py                        # All-in-one bootstrap & launch script
-└── README.md                     # Documentation
+│   └── test_pipeline.py      # Automated tests
+├── requirements.txt          # Python dependencies
+├── run.py                    # All-in-one launcher script
+└── README.md                 # Project documentation
 ```
 
 ---
 
-## Quick Start Guide (All Operating Systems)
+## Technology Stack
 
-### Prerequisites
-- **Python 3.10, 3.11, or 3.12** installed on your system.
-
----
-
-### Windows
-
-#### Using PowerShell (Recommended)
-1. Open PowerShell and navigate to the project directory:
-   ```powershell
-   cd path\to\fraud_det
-   ```
-2. Enable script execution (if not already enabled):
-   ```powershell
-   Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
-   ```
-3. Create and activate the virtual environment:
-   ```powershell
-   python -m venv venv
-   .\venv\Scripts\Activate.ps1
-   ```
-4. Install dependencies and start the system:
-   ```powershell
-   pip install -r requirements.txt
-   python run.py
-   ```
-
-#### Using Command Prompt (CMD)
-1. Open CMD and navigate to the project directory:
-   ```cmd
-   cd path\to\fraud_det
-   ```
-2. Create and activate the virtual environment:
-   ```cmd
-   python -m venv venv
-   venv\Scripts\activate.bat
-   ```
-3. Install dependencies and start:
-   ```cmd
-   pip install -r requirements.txt
-   python run.py
-   ```
-
----
-
-### macOS
-
-1. Open Terminal and navigate to the project directory:
-   ```bash
-   cd path/to/fraud_det
-   ```
-2. Create and activate the virtual environment:
-   ```bash
-   python3 -m venv venv
-   source venv/bin/activate
-   ```
-3. Install dependencies and start:
-   ```bash
-   pip install -r requirements.txt
-   python3 run.py
-   ```
-
----
-
-### Linux
-
-#### Bash / Zsh
-1. Open Terminal and navigate to the project directory:
-   ```bash
-   cd path/to/fraud_det
-   ```
-2. Create and activate the virtual environment:
-   ```bash
-   python3 -m venv venv
-   source venv/bin/activate
-   ```
-3. Install dependencies and start:
-   ```bash
-   pip install -r requirements.txt
-   python3 run.py
-   ```
-
-#### Fish Shell
-1. Open Terminal and navigate to the project directory:
-   ```fish
-   cd path/to/fraud_det
-   ```
-2. Create and activate the virtual environment:
-   ```fish
-   python3 -m venv venv
-   source venv/bin/activate.fish
-   ```
-3. Install dependencies and start:
-   ```fish
-   pip install -r requirements.txt
-   python3 run.py
-   ```
-
----
-
-## What `run.py` Does Automatically
-
-When you run `python run.py`, the script executes the complete setup sequence:
-1. Verifies if `data/raw/transactions.csv` exists; if not, generates a 25,000-record dataset modeled after PaySim.
-2. Trains and benchmarks Logistic Regression, Random Forest, and Gradient Boosting models, saving the best model to `ml/artifacts/best_model.joblib`.
-3. Initializes the database tables and seeds initial transactions for the audit log.
-4. Starts the FastAPI server and serves the web dashboard.
-
----
-
-## Accessing the Platform
-
-Once `run.py` finishes starting:
-
-- **Web Dashboard & Transaction Simulator**: [http://127.0.0.1:8000](http://127.0.0.1:8000)
-- **Interactive Swagger API Documentation**: [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
-- **API Health Check**: [http://127.0.0.1:8000/api/v1/health](http://127.0.0.1:8000/api/v1/health)
-
-Press `Ctrl + C` in your terminal to stop the server at any time.
-
----
-
-## API Testing Examples (cURL)
-
-### 1. Test a Legitimate Coffee Transaction
-```bash
-curl -X POST "http://127.0.0.1:8000/api/v1/predict" \
-     -H "Content-Type: application/json" \
-     -d '{
-       "step": 10,
-       "type": "PAYMENT",
-       "amount": 4.50,
-       "name_orig": "C1002341",
-       "oldbalance_orig": 500.00,
-       "newbalance_orig": 495.50,
-       "name_dest": "M9918231",
-       "oldbalance_dest": 1000.00,
-       "newbalance_dest": 1004.50
-     }'
-```
-
-### 2. Test a Fraudulent Account Draining Attack
-```bash
-curl -X POST "http://127.0.0.1:8000/api/v1/predict" \
-     -H "Content-Type: application/json" \
-     -d '{
-       "step": 3,
-       "type": "TRANSFER",
-       "amount": 95000.00,
-       "name_orig": "C88219472",
-       "oldbalance_orig": 95000.00,
-       "newbalance_orig": 0.00,
-       "name_dest": "C19028471",
-       "oldbalance_dest": 0.00,
-       "newbalance_dest": 0.00
-     }'
-```
-
----
-
-## Database Configuration (Switching to MySQL)
-
-By default, the platform uses SQLite (`fraud_detection.db`) with zero setup.
-
-To switch to a **MySQL** database:
-1. Create a `.env` file in the project root:
-   ```env
-   DATABASE_URL=mysql+pymysql://username:password@localhost:3306/fraud_det
-   ```
-2. Re-run `python run.py`. The tables will be initialized in your MySQL instance automatically.
-
----
-
-## Running Automated Tests
-
-To execute the test suite:
-```bash
-pytest tests/
-```
+- **Machine Learning**: Python, Scikit-Learn, Pandas, NumPy, Joblib
+- **Backend API**: FastAPI, Uvicorn, Pydantic
+- **Database**: SQLite (default, zero configuration) / MySQL compatible via SQLAlchemy
+- **Frontend**: HTML5, Tailwind CSS, Chart.js, Lucide Icons
