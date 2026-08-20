@@ -1,5 +1,5 @@
 /**
- * Sentinel Financial Fraud Detection Platform - Dashboard Client
+ * Financial Fraud Detection Platform - Dashboard Client
  */
 
 let decisionChartInstance = null;
@@ -13,7 +13,7 @@ const CURRENCIES = {
     GBP: { symbol: '£', code: 'GBP', locale: 'en-GB' }
 };
 
-let currentCurrency = localStorage.getItem('sentinel_currency') || 'USD';
+let currentCurrency = localStorage.getItem('fraud_det_currency') || 'USD';
 
 function formatCurrencyAmount(amount) {
     const config = CURRENCIES[currentCurrency] || CURRENCIES.USD;
@@ -31,7 +31,7 @@ function formatCurrencyAmount(amount) {
 function onCurrencyChange(currencyCode) {
     if (!CURRENCIES[currencyCode]) return;
     currentCurrency = currencyCode;
-    localStorage.setItem('sentinel_currency', currencyCode);
+    localStorage.setItem('fraud_det_currency', currencyCode);
     updateCurrencyDisplay();
     fetchAuditLog();
 }

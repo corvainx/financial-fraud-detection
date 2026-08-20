@@ -1,4 +1,4 @@
-# Sentinel: AI-Based Financial Fraud Detection Platform
+# AI-Based Financial Fraud Detection Platform
 
 An intelligent, real-time security system that analyzes financial transactions, calculates a fraud risk score using Machine Learning, and automatically stops suspicious activity before money is stolen.
 

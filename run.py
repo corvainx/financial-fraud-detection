@@ -1,5 +1,5 @@
 """
-Application Launcher for Sentinel AI Financial Fraud Detection Platform.
+Application Launcher for AI Financial Fraud Detection Platform.
 
 Performs:
 1. Dataset verification & generation (if not present)
@@ -24,7 +24,7 @@ from ml.train import train_and_benchmark
 
 def bootstrap_system():
     print("\n" + "=" * 65)
-    print("SENTINEL: FINANCIAL FRAUD DETECTION PLATFORM")
+    print("AI FINANCIAL FRAUD DETECTION PLATFORM")
     print("=" * 65)
 
     # 1. Check / Generate Dataset
