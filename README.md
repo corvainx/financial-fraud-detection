@@ -1,228 +1,237 @@
-# AI-Based Financial Fraud Detection Platform
+# Financial Fraud Detection Platform
 
-An intelligent, real-time security system that analyzes financial transactions, calculates a fraud risk score using Machine Learning, and automatically stops suspicious activity before money is stolen.
+![Python](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12-blue)
+![FastAPI](https://img.shields.io/badge/backend-FastAPI-009688)
 
----
-
-## 1. What Is This Project? (The Simple Explanation)
-
-Imagine a security guard standing at a bank's digital counter:
-- Every time a customer sends money, the guard checks who is sending it, how much is being sent, what time it is, and whether the account balance makes sense.
-- If everything looks normal (like buying coffee at 10 AM), the transaction goes through immediately.
-- If something looks slightly unusual, the guard pauses the transfer and asks for an OTP verification.
-- If an attacker is draining an entire bank account at 3 AM, the guard immediately **blocks** the transfer.
-
-**This project is that digital security guard, powered by Artificial Intelligence.**
+An intelligent, real-time system that analyzes financial transactions, scores them for fraud risk using Machine Learning, and automatically stops suspicious activity before money is stolen.
 
 ---
 
-## 2. The Problem: Why Old Security Systems Fail
+## Table of Contents
 
-Traditional bank security relies on rigid, manual rules:
+1. [What Is This Project?](#1-what-is-this-project)
+2. [Why Old Security Systems Fail](#2-why-old-security-systems-fail)
+3. [How It Works](#3-how-it-works)
+4. [The Machine Learning, Explained Simply](#4-the-machine-learning-explained-simply)
+5. [Model Results](#5-model-results)
+6. [Web Dashboard](#6-web-dashboard)
+7. [Getting Started](#7-getting-started)
+8. [Project Structure](#8-project-structure)
+9. [Technology Stack](#9-technology-stack)
+
+---
+
+## 1. What Is This Project?
+
+Imagine a security guard standing at a bank's digital counter, watching every transaction go by:
+
+- A customer buys coffee for $4.50 at 10 AM → looks completely normal → **waved through instantly**.
+- A customer makes a slightly larger, slightly unusual transfer → the guard pauses and asks for a one-time password to confirm it's really them → **flagged for verification**.
+- Someone tries to drain an entire account at 3 AM in one shot → the guard doesn't wait around → **transaction blocked on the spot**.
+
+**This system is that guard, except it's an AI model instead of a person, and it evaluates every transaction in a fraction of a second.**
+
+It doesn't just watch the dollar amount. It looks at timing, account balances before and after, how much of someone's net worth is moving at once, and whether the numbers even add up correctly — then combines all of that into a single risk score.
+
+---
+
+## 2. Why Old Security Systems Fail
+
+Most traditional bank security runs on simple, hardcoded rules, like:
+
 ```
 Rule: "If a transfer is greater than $10,000, block it."
 ```
-**Why this fails:** Fraudsters quickly learn the rules. They will simply transfer $9,999 multiple times or steal smaller amounts across thousands of accounts.
 
-**The Solution:** Instead of fixed rules, this project uses **Machine Learning**. The AI looks at multiple subtle clues simultaneously (timing, balance changes, account history) to spot fraud patterns that humans and simple rules miss.
+This sounds reasonable, but it's easy to defeat once you know the rule exists. A fraudster just sends $9,999 four times instead of $40,000 once, and the rule never fires. Rigid rules can only catch what someone already thought to write down in advance.
+
+**Machine learning takes a different approach.** Instead of one rule, the model looks at dozens of subtle signals at the same time, patterns a human wouldn't think to check for, and learns from thousands of real examples what fraud actually tends to look like. It adapts to combinations of behavior, not just a single number crossing a single threshold.
 
 ---
 
-## 3. How It Works Under the Hood (The 5-Step Pipeline)
+## 3. How It Works
+
+Every transaction flows through five stages:
 
 ```
-[1. Incoming Transaction] 
+[1. Transaction Comes In]
           │
           ▼
-[2. Feature Detective] ──> (Checks for balance errors, 3 AM transfers, emptied accounts)
+[2. Feature Detective]   →  checks timing, balance math, account drain, transfer ratio
           │
           ▼
-[3. AI / ML Brain]     ──> (Compares transaction against 25,000 historical patterns)
+[3. AI Model]             →  compares against patterns learned from 25,000 past transactions
           │
           ▼
-[4. Risk Score & Decision]
+[4. Risk Score + Decision]
           │
-          ├── Score < 30%   ──> APPROVE (Low Risk, instant approval)
-          ├── Score 30-75%  ──> FLAG (Medium Risk, requires OTP / MFA)
-          └── Score > 75%   ──> BLOCK (High Risk, immediate prevention)
+          ├── Score < 30%    →  APPROVE  (instant, no friction)
+          ├── Score 30–75%   →  FLAG     (ask for OTP / two-factor)
+          └── Score > 75%    →  BLOCK    (stopped immediately)
           │
           ▼
-[5. Database & Web Dashboard]
-          └── Saves record in audit log and updates live charts
+[5. Logged to Database + Shown on Live Dashboard]
 ```
 
-### Step 1: A Transaction Arrives
-A customer initiates a transfer. The system receives standard details:
-- **Transaction Type**: Transfer, Cash-Out, Payment, Cash-In, or Debit.
-- **Amount**: The amount being moved.
-- **Sender Balance**: Balance before and after the transaction.
-- **Receiver Balance**: Receiver's balance before and after.
-- **Time of Day**: Hour the transaction occurred (0 to 23).
+### Step 1 — A transaction arrives
+The system receives the basics: transaction type (transfer, cash-out, payment, cash-in, or debit), the amount, the sender's balance before and after, the receiver's balance before and after, and the hour of the day it happened.
 
-### Step 2: The Feature Detective (Domain Processing)
-Before handing the data to the AI, the system calculates hidden cybersecurity indicators:
-- **Account Draining Check**: Did this transaction reduce the sender's balance to exactly zero?
-- **Balance Math Check**: Does `(Old Balance - Amount) == New Balance`? (Fraudulent transactions often have balance mismatches).
-- **Abnormal Hours Check**: Is this happening between 1 AM and 5 AM?
-- **Transfer Volume Ratio**: What percentage of the sender's total net worth is being moved in a single second?
+### Step 2 — The Feature Detective
+Before the AI even sees the data, the system calculates a handful of cybersecurity-flavored red flags:
 
-### Step 3: The AI Model (Pattern Recognition)
-The machine learning model scans the numbers. Having learned from thousands of past transactions, it calculates the mathematical probability that the transaction is fraud.
+- **Account draining** — did this transaction empty the sender's balance to exactly zero?
+- **Balance math check** — does `old balance − amount` actually equal the new balance? Real fraud attempts often produce balances that don't quite add up.
+- **Odd hours** — is this happening between 1 AM and 5 AM, when legitimate activity is rare?
+- **Transfer volume ratio** — what percentage of the sender's entire net worth is moving in this one transaction?
 
-### Step 4: The 3-Tier Security Decision
-The probability is converted into a **Risk Score (0% to 100%)**:
-- **`APPROVE` (Score < 30%)**: Normal behavioral pattern. Transaction proceeds with zero friction.
-- **`FLAG` (Score 30% – 75%)**: Moderate risk. The system flags the transfer and prompts the user for two-factor authentication (OTP/MFA).
-- **`BLOCK` (Score > 75%)**: High risk. The transaction is immediately stopped, and the reason is logged.
+### Step 3 — The AI model
+The model takes all of the above and estimates the probability that this specific transaction is fraudulent, based on patterns it learned during training.
 
-### Step 5: Database Logging & Dashboard Display
-The transaction, risk score, decision, and reasons are saved into the database and instantly rendered on the live web dashboard.
+### Step 4 — The three-tier decision
+That probability becomes a risk score from 0–100%, and the score decides what happens: approve, flag for extra verification, or block outright.
+
+### Step 5 — Logging and the dashboard
+Every decision, along with the reasoning behind it, is saved to the database and shows up live on the web dashboard.
 
 ---
 
-## 4. Machine Learning Explained in Plain English
+## 4. The Machine Learning, Explained Simply
 
-### What is the ML Model doing?
-The machine learning model is not magic; it is statistical pattern recognition. During training, the computer is shown a spreadsheet of **25,000 historical transactions**:
-- 24,500 are labeled **Legitimate (0)**.
-- 500 are labeled **Fraudulent (1)**.
+### What is the model actually doing?
+There's no magic here, it's statistical pattern recognition. During training, the model is shown a spreadsheet of **25,000 historical transactions**, each one already labeled:
 
-The model learns what normal behavior looks like vs. what an attack looks like.
+- **24,500 legitimate** (98%)
+- **500 fraudulent** (2%)
 
-### Which Models are Tested?
-The system automatically trains and compares three different algorithms:
-1. **Logistic Regression**: A fast, baseline linear model.
-2. **Random Forest**: An ensemble of 100 decision trees voting together.
-3. **Gradient Boosting**: An advanced model that builds trees sequentially, each correcting the mistakes of the previous tree.
+That lopsided split is intentional, and it mirrors reality: fraud is genuinely rare compared to normal activity, which is exactly what makes it hard to catch. A lazy model could just guess "legitimate" every single time and still be right 98% of the time, while catching zero fraud. The model is specifically evaluated on how well it finds that rare 2%, not on raw accuracy, which is why recall and F1-score (see below) matter more here than a plain accuracy number would.
 
-The system automatically measures which model has the highest **F1-Score and Recall** (fraud detection rate) and saves the winning model for live predictions.
+### Which models are compared?
+Three different algorithms are trained and benchmarked against each other:
 
----
+1. **Logistic Regression** — a fast, simple linear baseline.
+2. **Random Forest** — 100 decision trees voting together on each transaction.
+3. **Gradient Boosting** — trees built one after another, each one specifically correcting the mistakes of the last.
 
-## 5. Web Dashboard & Features
-
-When you open the web interface, you have access to:
-
-1. **Transaction Scoring Simulator**:
-   - Test custom transaction values or select one-click presets:
-     - *Point of Sale*: Normal $4.50 coffee payment.
-     - *Direct Deposit*: Legitimate $3,200 salary deposit.
-     - *High Transfer*: Elevated $18,000 business move.
-     - *Account Drain*: Suspicious $95,000 account wipeout at 3 AM.
-2. **Real-Time Risk Gauge**:
-   - Visual progress bar showing exact fraud probability and human-readable explanation tags.
-3. **Multi-Currency Switcher**:
-   - Seamlessly toggle currency formatting between **INR (₹)**, **USD ($)**, **EUR (€)**, and **GBP (£)** across all forms, presets, and tables.
-4. **Analytics Charts**:
-   - Live doughnut chart of Approved vs. Flagged vs. Blocked transfers.
-   - Histogram showing how risk scores are distributed.
-5. **Transaction Audit Log Table**:
-   - Searchable, filterable log of all evaluated transactions with timestamps and decisions.
+Whichever model scores highest on **F1-score and Recall** (i.e., whichever one actually catches the most fraud with the fewest false alarms) is automatically saved and used for live predictions.
 
 ---
 
-## 6. How to Run the Project (Step-by-Step)
+## 5. Model Results
+
+> Fill this in after running `python run.py` — the training step prints these exact numbers, and `ml/artifacts/` will contain the saved model.
+
+| Model               | Precision | Recall | F1-Score | Notes |
+|----------------------|-----------|--------|----------|-------|
+| Logistic Regression   | —         | —      | —        | baseline |
+| Random Forest         | —         | —      | —        |          |
+| Gradient Boosting     | —         | —      | —        |          |
+
+**Winning model:** *(name the one `run.py` selects)*
+
+---
+
+## 6. Web Dashboard
+
+Once the server is running, the dashboard gives you:
+
+- **Transaction Scoring Simulator** — test your own values, or use one-click presets:
+  - *Point of Sale*: normal $4.50 coffee payment
+  - *Direct Deposit*: legitimate $3,200 salary deposit
+  - *High Transfer*: elevated $18,000 business transfer
+  - *Account Drain*: suspicious $95,000 wipeout at 3 AM
+- **Real-Time Risk Gauge** — a visual bar showing the fraud probability plus a plain-English explanation of why.
+- **Multi-Currency Switcher** — toggle between INR (₹), USD ($), EUR (€), and GBP (£) across every form, preset, and table.
+- **Analytics Charts** — a live doughnut chart of approved vs. flagged vs. blocked transactions, plus a histogram of how risk scores are distributed.
+- **Audit Log Table** — a searchable, filterable log of every transaction the system has evaluated, with timestamps and decisions.
+
+> *(Drop a screenshot or GIF of the dashboard here — it does more to explain this section than any amount of text.)*
+
+---
+
+## 7. Getting Started
 
 ### Prerequisites
-- Python 3.10, 3.11, or 3.12 installed on your computer.
+- Python 3.10, 3.11, or 3.12
 
----
+### Step 1 — Clone and create a virtual environment
 
-### Step 1: Open Your Terminal and Activate the Environment
+```bash
+git clone https://github.com/corvainx/financial-fraud-detection.git
+cd financial-fraud-detection
+python -m venv venv
+```
 
-- **Linux (Fish Shell)**:
-  ```fish
-  cd path/to/fraud_det
-  source venv/bin/activate.fish
-  ```
+### Step 2 — Activate the virtual environment
 
-- **Linux / macOS (Bash or Zsh)**:
-  ```bash
-  cd path/to/fraud_det
-  source venv/bin/activate
-  ```
+| Shell | Command |
+|---|---|
+| Linux (bash/zsh) | `source venv/bin/activate` |
+| Linux (fish) | `source venv/bin/activate.fish` |
+| Windows (PowerShell) | `.\venv\Scripts\Activate.ps1` |
+| Windows (cmd) | `venv\Scripts\activate.bat` |
 
-- **Windows (PowerShell)**:
-  ```powershell
-  cd path\to\fraud_det
-  .\venv\Scripts\Activate.ps1
-  ```
-
-- **Windows (Command Prompt)**:
-  ```cmd
-  cd path\to\fraud_det
-  venv\Scripts\activate.bat
-  ```
-
----
-
-### Step 2: Install Dependencies
+### Step 3 — Install dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
----
-
-### Step 3: Start the Platform
+### Step 4 — Run everything
 
 ```bash
 python run.py
 ```
 
-`run.py` automatically handles everything:
+This one script handles the whole pipeline:
 1. Generates the historical transaction dataset.
-2. Trains and benchmarks the AI models.
-3. Saves the best model file.
-4. Initializes the database and seeds initial transaction history.
+2. Trains and benchmarks the three ML models.
+3. Saves the winning model to disk.
+4. Initializes the database and seeds it with sample history.
 5. Starts the web server.
 
----
+### Step 5 — Open it in your browser
 
-### Step 4: Open in Your Browser
-
-- **Web Dashboard**: [http://127.0.0.1:8000](http://127.0.0.1:8000)
-- **API Documentation**: [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
+- **Dashboard:** [http://127.0.0.1:8000](http://127.0.0.1:8000)
+- **API docs:** [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
 
 ---
 
-## 7. Project Structure
+## 8. Project Structure
 
 ```
 fraud_det/
 ├── data/
-│   └── raw/                  # Transaction datasets (auto-generated)
+│   └── raw/                    # Transaction datasets (auto-generated)
 ├── ml/
-│   ├── dataset_generator.py  # Generates realistic PaySim financial data
-│   ├── feature_engineering.py# Extracts cybersecurity domain indicators
-│   ├── evaluate.py           # Calculates precision, recall, and F1 metrics
-│   ├── train.py              # Trains and benchmarks ML models
-│   └── artifacts/            # Stores the winning saved model (.joblib)
+│   ├── dataset_generator.py    # Generates realistic PaySim-style financial data
+│   ├── feature_engineering.py  # Extracts the cybersecurity indicators
+│   ├── train.py                # Trains and benchmarks the three models
+│   ├── evaluate.py             # Computes precision, recall, F1
+│   └── artifacts/              # Saved winning model (.joblib)
 ├── backend/
 │   ├── app/
-│   │   ├── api/              # FastAPI endpoints (/predict, /transactions, /analytics)
-│   │   ├── core/             # Configuration and database connection
-│   │   ├── models/           # Database tables (SQLAlchemy)
-│   │   ├── schemas/          # Input/output data validation (Pydantic)
-│   │   └── services/         # Inference engine & 3-tier decision rules
-│   └── main.py               # FastAPI server application
+│   │   ├── api/                # FastAPI endpoints (/predict, /transactions, /analytics)
+│   │   ├── core/                # Config and database connection
+│   │   ├── models/              # SQLAlchemy database tables
+│   │   ├── schemas/             # Pydantic input/output validation
+│   │   └── services/            # Inference engine + 3-tier decision logic
+│   └── main.py                  # FastAPI app entry point
 ├── frontend/
-│   ├── index.html            # Web dashboard user interface
-│   ├── css/style.css         # Styling and layouts
-│   └── js/app.js             # Currency switcher, charts, and simulator logic
+│   ├── index.html               # Dashboard UI
+│   ├── css/style.css
+│   └── js/app.js                # Simulator, charts, currency switching
 ├── tests/
-│   └── test_pipeline.py      # Automated test suite
-├── requirements.txt          # Python dependencies
-├── run.py                    # All-in-one bootstrap and launcher script
-└── README.md                 # Project documentation
+│   └── test_pipeline.py
+├── requirements.txt
+├── run.py                       # One-command bootstrap + launcher
+└── README.md
 ```
 
 ---
 
-## 8. Technology Stack
+## 9. Technology Stack
 
-- **Machine Learning**: Python, Scikit-Learn, Pandas, NumPy, Joblib
-- **Backend API**: FastAPI, Uvicorn, Pydantic
-- **Database**: SQLite (default, zero setup) / MySQL compatible via SQLAlchemy
-- **Frontend Dashboard**: HTML5, Tailwind CSS, Chart.js, Lucide Icons
-
+- **Machine Learning:** Python, scikit-learn, pandas, NumPy, joblib
+- **Backend API:** FastAPI, Uvicorn, Pydantic
+- **Database:** SQLite by default (zero setup), MySQL-compatible via SQLAlchemy
+- **Frontend:** HTML5, Tailwind CSS, Chart.js, Lucide Icons
