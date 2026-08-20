@@ -29,19 +29,18 @@ class FraudInferenceEngine:
         If not found, triggers training automatically.
         """
         if not os.path.exists(settings.MODEL_PATH):
-            print(f"⚠️ Model artifact not found at {settings.MODEL_PATH}. Training model now...")
+            print(f"[INFERENCE] Model artifact not found at {settings.MODEL_PATH}. Initiating training...")
             from ml.train import train_and_benchmark
             train_and_benchmark()
 
-        print(f"🧠 Loading ML model from {settings.MODEL_PATH}...")
+        print(f"[INFERENCE] Loading ML model from {settings.MODEL_PATH}...")
         self._model = joblib.load(settings.MODEL_PATH)
-        print("✅ ML Model loaded successfully into memory.")
+        print("[INFERENCE] Model pipeline loaded successfully into memory.")
 
     def evaluate_transaction(self, txn: TransactionCreate) -> Dict[str, Any]:
         """
         Takes a transaction input, prepares features, runs inference, and returns risk & decision.
         """
-        # Convert Pydantic model to DataFrame with column names expected by ML pipeline
         data_dict = {
             'step': [txn.step],
             'type': [txn.type.upper()],
@@ -58,12 +57,12 @@ class FraudInferenceEngine:
         # 1. Generate ML Risk Score (Probability of Fraud: 0.0 to 1.0)
         try:
             probabilities = self._model.predict_proba(df)[0]
-            risk_score = float(probabilities[1])  # Class 1 = Fraud
+            risk_score = float(probabilities[1])
         except Exception as e:
-            print(f"Prediction fallback due to: {e}")
+            print(f"[INFERENCE] Prediction fallback: {e}")
             risk_score = 0.05
 
-        # 2. Rule-Based Cybersecurity Explanations
+        # 2. Cybersecurity Explanations
         flag_reasons: List[str] = []
         hour = txn.step % 24
         orig_err = (txn.newbalance_orig + txn.amount) - txn.oldbalance_orig
@@ -88,16 +87,16 @@ class FraudInferenceEngine:
             decision = "BLOCK"
             is_fraud = True
             if not flag_reasons:
-                flag_reasons.append(f"Critical AI Risk Score ({risk_score*100:.1f}%) exceeds block threshold ({settings.BLOCK_THRESHOLD*100:.0f}%)")
+                flag_reasons.append(f"Risk score ({risk_score*100:.1f}%) exceeds block threshold ({settings.BLOCK_THRESHOLD*100:.0f}%)")
         elif risk_score >= settings.FLAG_THRESHOLD:
             decision = "FLAG"
             is_fraud = False
             if not flag_reasons:
-                flag_reasons.append(f"Moderate AI Risk Score ({risk_score*100:.1f}%) requires step-up authentication (OTP/MFA)")
+                flag_reasons.append(f"Risk score ({risk_score*100:.1f}%) requires step-up verification (OTP/MFA)")
         else:
             decision = "APPROVE"
             is_fraud = False
-            flag_reasons.append("Normal behavioral pattern verified by AI model")
+            flag_reasons.append("Normal behavioral pattern verified by model")
 
         return {
             "transaction_id": f"TXN-{uuid.uuid4().hex[:10].upper()}",
@@ -109,5 +108,4 @@ class FraudInferenceEngine:
         }
 
 
-# Singleton engine instance
 engine = FraudInferenceEngine()

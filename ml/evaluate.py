@@ -20,19 +20,16 @@ def evaluate_model(model, X_test, y_test, model_name: str = "Classifier", thresh
     """
     Evaluates a trained classifier on test data with a configurable decision threshold.
     """
-    # 1. Predict probabilities for fraud (class 1)
     if hasattr(model, "predict_proba"):
         y_probs = model.predict_proba(X_test)[:, 1]
     elif hasattr(model, "decision_function"):
         decision = model.decision_function(X_test)
-        y_probs = 1 / (1 + np.exp(-decision))  # Sigmoid conversion
+        y_probs = 1 / (1 + np.exp(-decision))
     else:
         y_probs = model.predict(X_test)
 
-    # 2. Apply threshold
     y_pred = (y_probs >= threshold).astype(int)
 
-    # 3. Calculate metrics
     cm = confusion_matrix(y_test, y_pred)
     tn, fp, fn, tp = cm.ravel()
 
@@ -76,22 +73,22 @@ def evaluate_model(model, X_test, y_test, model_name: str = "Classifier", thresh
 
 def print_evaluation_summary(metrics: Dict[str, Any]):
     """
-    Prints a clear, formatted summary of model performance for reports.
+    Prints a formatted summary of model performance for reports.
     """
     cm = metrics["confusion_matrix"]
     print(f"\n=======================================================")
-    print(f"📊 EVALUATION REPORT: {metrics['model_name']} (Threshold: {metrics['threshold']})")
+    print(f"EVALUATION REPORT: {metrics['model_name']} (Threshold: {metrics['threshold']})")
     print(f"=======================================================")
-    print(f"  • Precision (Fraud Accuracy) : {metrics['precision']*100:.2f}%  (Low false alarms)")
-    print(f"  • Recall (Fraud Catch Rate)  : {metrics['recall']*100:.2f}%  (Fraud caught)")
-    print(f"  • F1-Score (Balanced Score)  : {metrics['f1_score']:.4f}")
-    print(f"  • PR-AUC (Avg Precision)     : {metrics['pr_auc']:.4f}")
-    print(f"  • ROC-AUC                    : {metrics['roc_auc']:.4f}")
-    print(f"  • Raw Accuracy               : {metrics['accuracy']*100:.2f}%")
+    print(f"  - Precision (Fraud Accuracy) : {metrics['precision']*100:.2f}%")
+    print(f"  - Recall (Fraud Catch Rate)  : {metrics['recall']*100:.2f}%")
+    print(f"  - F1-Score                   : {metrics['f1_score']:.4f}")
+    print(f"  - PR-AUC (Average Precision) : {metrics['pr_auc']:.4f}")
+    print(f"  - ROC-AUC                    : {metrics['roc_auc']:.4f}")
+    print(f"  - Accuracy                   : {metrics['accuracy']*100:.2f}%")
     print(f"-------------------------------------------------------")
     print(f"  Confusion Matrix Breakdown:")
-    print(f"    - True Negatives  (Legit Approved) : {cm['true_negatives']:,}")
-    print(f"    - False Positives (False Alarms)   : {cm['false_positives']:,}")
-    print(f"    - False Negatives (Missed Fraud)   : {cm['false_negatives']:,}")
-    print(f"    - True Positives  (Fraud Caught)   : {cm['true_positives']:,}")
+    print(f"    - True Negatives  (Legitimate Approved) : {cm['true_negatives']:,}")
+    print(f"    - False Positives (False Alarms)        : {cm['false_positives']:,}")
+    print(f"    - False Negatives (Missed Fraud)        : {cm['false_negatives']:,}")
+    print(f"    - True Positives  (Fraud Detected)      : {cm['true_positives']:,}")
     print(f"=======================================================\n")

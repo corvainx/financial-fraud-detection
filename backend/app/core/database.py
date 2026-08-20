@@ -7,7 +7,6 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base, sessionmaker
 from backend.app.core.config import settings
 
-# Configure connection arguments based on database dialect
 connect_args = {}
 if settings.DATABASE_URL.startswith("sqlite"):
     connect_args = {"check_same_thread": False}
@@ -39,4 +38,5 @@ def init_db():
     """
     import backend.app.models.transaction  # noqa: F401
     Base.metadata.create_all(bind=engine)
-    print(f"🗄️ Database initialized using: {settings.DATABASE_URL.split('://')[0].upper()}")
+    db_type = settings.DATABASE_URL.split("://")[0].upper()
+    print(f"[DB] Database initialized successfully ({db_type})")

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Financial Fraud Detection Platform</title>
+    <title>Sentinel - Financial Fraud Detection Platform</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -12,11 +12,6 @@
             theme: {
                 extend: {
                     colors: {
-                        brand: {
-                            50: '#f0fdf4',
-                            500: '#22c55e',
-                            600: '#16a34a',
-                        },
                         darkBg: '#0b0f19',
                         cardBg: '#111827',
                         borderBg: '#1f293d'
@@ -31,31 +26,31 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <link rel="stylesheet" href="/static/css/style.css">
 </head>
-<body class="bg-darkBg text-slate-100 min-h-screen font-sans antialiased selection:bg-indigo-500 selection:text-white">
+<body class="bg-darkBg text-slate-100 min-h-screen font-sans antialiased">
 
     <!-- Top Navigation -->
-    <header class="border-b border-borderBg bg-cardBg/80 backdrop-blur sticky top-0 z-50">
+    <header class="border-b border-borderBg bg-cardBg/90 backdrop-blur sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
             <div class="flex items-center space-x-3">
                 <div class="p-2 bg-indigo-600/20 text-indigo-400 rounded-lg border border-indigo-500/30">
-                    <i data-lucide="shield-alert" class="w-6 h-6"></i>
+                    <i data-lucide="shield-check" class="w-5 h-5"></i>
                 </div>
                 <div>
-                    <h1 class="text-lg font-bold tracking-wide text-white flex items-center gap-2">
-                        SENTINEL <span class="text-xs px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-400 border border-indigo-500/30">AI FRAUD ENGINE</span>
+                    <h1 class="text-base font-bold tracking-wide text-white flex items-center gap-2">
+                        SENTINEL <span class="text-[11px] px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 font-semibold tracking-normal">RISK ENGINE</span>
                     </h1>
-                    <p class="text-xs text-slate-400">Cybersecurity Transaction Risk Analysis</p>
+                    <p class="text-[11px] text-slate-400">Transaction Risk Scoring System</p>
                 </div>
             </div>
 
             <div class="flex items-center space-x-4">
                 <div id="modelBadge" class="hidden md:flex items-center space-x-2 text-xs bg-slate-800/80 px-3 py-1.5 rounded-full border border-slate-700">
-                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                    <span id="activeModelName" class="text-slate-300">Model: Loading...</span>
+                    <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                    <span id="activeModelName" class="text-slate-300">Model: Initializing</span>
                 </div>
-                <a href="/docs" target="_blank" class="text-xs flex items-center gap-1 bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded-lg border border-slate-700 transition">
-                    <i data-lucide="file-code" class="w-3.5 h-3.5"></i>
-                    <span>Swagger API</span>
+                <a href="/docs" target="_blank" class="text-xs flex items-center gap-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded-lg border border-slate-700 transition">
+                    <i data-lucide="file-code" class="w-3.5 h-3.5 text-slate-400"></i>
+                    <span>API Reference</span>
                 </a>
             </div>
         </div>
@@ -67,49 +62,49 @@
         <!-- KPI Metrics Grid -->
         <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
             <!-- Card 1 -->
-            <div class="bg-cardBg border border-borderBg rounded-xl p-5 shadow-lg relative overflow-hidden group">
+            <div class="bg-cardBg border border-borderBg rounded-xl p-5 shadow-sm">
                 <div class="flex items-center justify-between">
-                    <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Total Evaluated</span>
+                    <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Total Processed</span>
                     <div class="p-2 bg-blue-500/10 text-blue-400 rounded-lg"><i data-lucide="activity" class="w-4 h-4"></i></div>
                 </div>
                 <div class="mt-3">
-                    <h3 id="kpiTotal" class="text-2xl font-extrabold text-white">0</h3>
-                    <p class="text-xs text-slate-400 mt-1">Processed transactions</p>
+                    <h3 id="kpiTotal" class="text-2xl font-bold text-white">0</h3>
+                    <p class="text-xs text-slate-400 mt-1">Total evaluated transactions</p>
                 </div>
             </div>
 
             <!-- Card 2 -->
-            <div class="bg-cardBg border border-borderBg rounded-xl p-5 shadow-lg relative overflow-hidden group">
+            <div class="bg-cardBg border border-borderBg rounded-xl p-5 shadow-sm">
                 <div class="flex items-center justify-between">
-                    <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Approved (Low Risk)</span>
-                    <div class="p-2 bg-emerald-500/10 text-emerald-400 rounded-lg"><i data-lucide="check-circle" class="w-4 h-4"></i></div>
+                    <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Approved</span>
+                    <div class="p-2 bg-emerald-500/10 text-emerald-400 rounded-lg"><i data-lucide="check-circle-2" class="w-4 h-4"></i></div>
                 </div>
                 <div class="mt-3">
-                    <h3 id="kpiApproved" class="text-2xl font-extrabold text-emerald-400">0</h3>
+                    <h3 id="kpiApproved" class="text-2xl font-bold text-emerald-400">0</h3>
                     <p class="text-xs text-slate-400 mt-1">Score &lt; 0.30</p>
                 </div>
             </div>
 
             <!-- Card 3 -->
-            <div class="bg-cardBg border border-borderBg rounded-xl p-5 shadow-lg relative overflow-hidden group">
+            <div class="bg-cardBg border border-borderBg rounded-xl p-5 shadow-sm">
                 <div class="flex items-center justify-between">
-                    <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Flagged (Review / MFA)</span>
+                    <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Flagged for Review</span>
                     <div class="p-2 bg-amber-500/10 text-amber-400 rounded-lg"><i data-lucide="alert-triangle" class="w-4 h-4"></i></div>
                 </div>
                 <div class="mt-3">
-                    <h3 id="kpiFlagged" class="text-2xl font-extrabold text-amber-400">0</h3>
+                    <h3 id="kpiFlagged" class="text-2xl font-bold text-amber-400">0</h3>
                     <p class="text-xs text-slate-400 mt-1">Score 0.30 - 0.75</p>
                 </div>
             </div>
 
             <!-- Card 4 -->
-            <div class="bg-cardBg border border-borderBg rounded-xl p-5 shadow-lg relative overflow-hidden group">
+            <div class="bg-cardBg border border-borderBg rounded-xl p-5 shadow-sm">
                 <div class="flex items-center justify-between">
-                    <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Blocked (High Risk)</span>
+                    <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Blocked</span>
                     <div class="p-2 bg-rose-500/10 text-rose-400 rounded-lg"><i data-lucide="shield-x" class="w-4 h-4"></i></div>
                 </div>
                 <div class="mt-3">
-                    <h3 id="kpiBlocked" class="text-2xl font-extrabold text-rose-400">0</h3>
+                    <h3 id="kpiBlocked" class="text-2xl font-bold text-rose-400">0</h3>
                     <p id="kpiFraudRate" class="text-xs text-slate-400 mt-1">Fraud Rate: 0.0%</p>
                 </div>
             </div>
@@ -120,30 +115,34 @@
             
             <!-- LEFT: Live Transaction Simulator (7 Cols) -->
             <div class="lg:col-span-7 space-y-6">
-                <div class="bg-cardBg border border-borderBg rounded-xl p-6 shadow-xl">
+                <div class="bg-cardBg border border-borderBg rounded-xl p-6 shadow-sm">
                     <div class="flex items-center justify-between mb-5">
                         <div class="flex items-center space-x-2">
-                            <i data-lucide="terminal" class="w-5 h-5 text-indigo-400"></i>
-                            <h2 class="text-base font-bold text-white">Live Transaction Simulator</h2>
+                            <i data-lucide="sliders" class="w-4 h-4 text-indigo-400"></i>
+                            <h2 class="text-sm font-bold text-white uppercase tracking-wider">Transaction Scoring Simulator</h2>
                         </div>
-                        <span class="text-xs text-slate-400">Real-Time Risk Scoring</span>
+                        <span class="text-xs text-slate-400">Real-Time Risk Analysis</span>
                     </div>
 
                     <!-- Preset Scenarios -->
                     <div class="mb-5">
-                        <label class="text-xs font-medium text-slate-300 block mb-2">⚡ Quick Test Scenarios:</label>
+                        <label class="text-xs font-medium text-slate-300 block mb-2">Preset Test Scenarios:</label>
                         <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
-                            <button type="button" onclick="loadPreset('coffee')" class="p-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg border border-slate-700 transition text-left">
-                                ☕ $4.50 Coffee<br><span class="text-[10px] text-emerald-400">Normal Payment</span>
+                            <button type="button" onclick="loadPreset('coffee')" class="p-2.5 bg-slate-800/80 hover:bg-slate-700/80 text-slate-200 rounded-lg border border-slate-700/80 transition text-left">
+                                <span class="font-semibold block text-slate-200">Point of Sale</span>
+                                <span class="text-[10px] text-emerald-400">$4.50 Payment</span>
                             </button>
-                            <button type="button" onclick="loadPreset('salary')" class="p-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg border border-slate-700 transition text-left">
-                                💼 $3,200 Deposit<br><span class="text-[10px] text-emerald-400">Regular Cash-In</span>
+                            <button type="button" onclick="loadPreset('salary')" class="p-2.5 bg-slate-800/80 hover:bg-slate-700/80 text-slate-200 rounded-lg border border-slate-700/80 transition text-left">
+                                <span class="font-semibold block text-slate-200">Direct Deposit</span>
+                                <span class="text-[10px] text-emerald-400">$3,200 Cash-In</span>
                             </button>
-                            <button type="button" onclick="loadPreset('transfer')" class="p-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg border border-slate-700 transition text-left">
-                                ⚠️ $18,000 Move<br><span class="text-[10px] text-amber-400">Elevated Transfer</span>
+                            <button type="button" onclick="loadPreset('transfer')" class="p-2.5 bg-slate-800/80 hover:bg-slate-700/80 text-slate-200 rounded-lg border border-slate-700/80 transition text-left">
+                                <span class="font-semibold block text-slate-200">High Transfer</span>
+                                <span class="text-[10px] text-amber-400">$18,000 Volume</span>
                             </button>
-                            <button type="button" onclick="loadPreset('drain')" class="p-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg border border-slate-700 transition text-left">
-                                🚨 $95,000 Drain<br><span class="text-[10px] text-rose-400">3 AM Attack</span>
+                            <button type="button" onclick="loadPreset('drain')" class="p-2.5 bg-slate-800/80 hover:bg-slate-700/80 text-slate-200 rounded-lg border border-slate-700/80 transition text-left">
+                                <span class="font-semibold block text-slate-200">Account Drain</span>
+                                <span class="text-[10px] text-rose-400">$95,000 (03:00 AM)</span>
                             </button>
                         </div>
                     </div>
@@ -151,10 +150,9 @@
                     <!-- Input Form -->
                     <form id="txnForm" class="space-y-4">
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <!-- Type -->
                             <div>
                                 <label class="text-xs font-medium text-slate-300">Transaction Type</label>
-                                <select id="formType" class="mt-1 w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                                <select id="formType" class="mt-1 w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:ring-1 focus:ring-indigo-500 focus:outline-none">
                                     <option value="TRANSFER">TRANSFER</option>
                                     <option value="CASH_OUT">CASH_OUT</option>
                                     <option value="PAYMENT">PAYMENT</option>
@@ -162,56 +160,52 @@
                                     <option value="DEBIT">DEBIT</option>
                                 </select>
                             </div>
-                            <!-- Amount -->
                             <div>
-                                <label class="text-xs font-medium text-slate-300">Amount ($ USD)</label>
-                                <input type="number" step="0.01" id="formAmount" required class="mt-1 w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:ring-2 focus:ring-indigo-500 focus:outline-none" value="95000.00">
+                                <label class="text-xs font-medium text-slate-300">Amount (USD)</label>
+                                <input type="number" step="0.01" id="formAmount" required class="mt-1 w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:ring-1 focus:ring-indigo-500 focus:outline-none" value="95000.00">
                             </div>
                         </div>
 
-                        <!-- Balances Sender -->
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
-                                <label class="text-xs font-medium text-slate-300">Sender Old Balance ($)</label>
-                                <input type="number" step="0.01" id="formOldOrig" required class="mt-1 w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:ring-2 focus:ring-indigo-500 focus:outline-none" value="95000.00">
+                                <label class="text-xs font-medium text-slate-300">Sender Balance Before ($)</label>
+                                <input type="number" step="0.01" id="formOldOrig" required class="mt-1 w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:ring-1 focus:ring-indigo-500 focus:outline-none" value="95000.00">
                             </div>
                             <div>
-                                <label class="text-xs font-medium text-slate-300">Sender New Balance ($)</label>
-                                <input type="number" step="0.01" id="formNewOrig" required class="mt-1 w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:ring-2 focus:ring-indigo-500 focus:outline-none" value="0.00">
+                                <label class="text-xs font-medium text-slate-300">Sender Balance After ($)</label>
+                                <input type="number" step="0.01" id="formNewOrig" required class="mt-1 w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:ring-1 focus:ring-indigo-500 focus:outline-none" value="0.00">
                             </div>
                         </div>
 
-                        <!-- Balances Receiver -->
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
-                                <label class="text-xs font-medium text-slate-300">Receiver Old Balance ($)</label>
-                                <input type="number" step="0.01" id="formOldDest" required class="mt-1 w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:ring-2 focus:ring-indigo-500 focus:outline-none" value="0.00">
+                                <label class="text-xs font-medium text-slate-300">Receiver Balance Before ($)</label>
+                                <input type="number" step="0.01" id="formOldDest" required class="mt-1 w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:ring-1 focus:ring-indigo-500 focus:outline-none" value="0.00">
                             </div>
                             <div>
-                                <label class="text-xs font-medium text-slate-300">Receiver New Balance ($)</label>
-                                <input type="number" step="0.01" id="formNewDest" required class="mt-1 w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:ring-2 focus:ring-indigo-500 focus:outline-none" value="0.00">
+                                <label class="text-xs font-medium text-slate-300">Receiver Balance After ($)</label>
+                                <input type="number" step="0.01" id="formNewDest" required class="mt-1 w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:ring-1 focus:ring-indigo-500 focus:outline-none" value="0.00">
                             </div>
                         </div>
 
-                        <!-- Time & Account IDs -->
                         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                             <div>
                                 <label class="text-xs font-medium text-slate-300">Hour of Day (0-23)</label>
-                                <input type="number" min="0" max="23" id="formHour" class="mt-1 w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:ring-2 focus:ring-indigo-500 focus:outline-none" value="3">
+                                <input type="number" min="0" max="23" id="formHour" class="mt-1 w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:ring-1 focus:ring-indigo-500 focus:outline-none" value="3">
                             </div>
                             <div>
-                                <label class="text-xs font-medium text-slate-300">Sender ID</label>
-                                <input type="text" id="formOrigId" class="mt-1 w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:ring-2 focus:ring-indigo-500 focus:outline-none" value="C88219472">
+                                <label class="text-xs font-medium text-slate-300">Origin Account</label>
+                                <input type="text" id="formOrigId" class="mt-1 w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:ring-1 focus:ring-indigo-500 focus:outline-none" value="C88219472">
                             </div>
                             <div>
-                                <label class="text-xs font-medium text-slate-300">Receiver ID</label>
-                                <input type="text" id="formDestId" class="mt-1 w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:ring-2 focus:ring-indigo-500 focus:outline-none" value="C19028471">
+                                <label class="text-xs font-medium text-slate-300">Destination Account</label>
+                                <input type="text" id="formDestId" class="mt-1 w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:ring-1 focus:ring-indigo-500 focus:outline-none" value="C19028471">
                             </div>
                         </div>
 
-                        <button type="submit" id="submitBtn" class="w-full mt-4 bg-indigo-600 hover:bg-indigo-500 text-white font-medium py-2.5 px-4 rounded-lg flex items-center justify-center space-x-2 transition shadow-lg shadow-indigo-600/30">
-                            <i data-lucide="zap" class="w-4 h-4"></i>
-                            <span>Evaluate Transaction Risk</span>
+                        <button type="submit" id="submitBtn" class="w-full mt-4 bg-indigo-600 hover:bg-indigo-500 text-white font-medium py-2.5 px-4 rounded-lg flex items-center justify-center space-x-2 transition shadow-sm">
+                            <i data-lucide="shield" class="w-4 h-4"></i>
+                            <span>Evaluate Transaction</span>
                         </button>
                     </form>
 
@@ -219,10 +213,10 @@
                     <div id="resultBox" class="mt-6 hidden border rounded-xl p-5 transition-all">
                         <div class="flex items-center justify-between mb-4">
                             <div>
-                                <span class="text-xs uppercase tracking-wider text-slate-400 font-semibold">AI Evaluation Result</span>
+                                <span class="text-xs uppercase tracking-wider text-slate-400 font-semibold">Evaluation Output</span>
                                 <h3 id="resultTxnId" class="text-sm font-mono text-slate-200">TXN-0000000000</h3>
                             </div>
-                            <div id="decisionBadge" class="px-4 py-1.5 rounded-full text-xs font-extrabold tracking-wider border">
+                            <div id="decisionBadge" class="px-4 py-1.5 rounded-full text-xs font-bold tracking-wider border">
                                 APPROVE
                             </div>
                         </div>
@@ -230,26 +224,24 @@
                         <!-- Risk Score Gauge Bar -->
                         <div class="space-y-2 mb-4">
                             <div class="flex justify-between text-xs font-medium">
-                                <span class="text-slate-300">Calculated Fraud Risk Probability:</span>
+                                <span class="text-slate-300">Calculated Fraud Probability:</span>
                                 <span id="riskPercentageText" class="font-bold text-white text-sm">0.0%</span>
                             </div>
-                            <div class="w-full bg-slate-800 rounded-full h-3.5 overflow-hidden p-0.5 border border-slate-700">
+                            <div class="w-full bg-slate-800 rounded-full h-3 overflow-hidden p-0.5 border border-slate-700">
                                 <div id="riskBarFill" class="h-full rounded-full transition-all duration-500 bg-emerald-500" style="width: 0%;"></div>
                             </div>
                             <div class="flex justify-between text-[10px] text-slate-500 font-mono">
-                                <span>0% (Safe)</span>
-                                <span>30% (Flag Threshold)</span>
-                                <span>75% (Block Threshold)</span>
-                                <span>100% (Fraud)</span>
+                                <span>0% (Legitimate)</span>
+                                <span>30% (Flag Boundary)</span>
+                                <span>75% (Block Boundary)</span>
+                                <span>100% (Fraudulent)</span>
                             </div>
                         </div>
 
                         <!-- Cybersecurity Indicators / Reasons -->
                         <div>
-                            <span class="text-xs font-medium text-slate-400 block mb-1.5">Model Explanations & Indicators:</span>
-                            <div id="reasonsList" class="flex flex-wrap gap-2">
-                                <!-- Dynamic tags inserted here -->
-                            </div>
+                            <span class="text-xs font-medium text-slate-400 block mb-1.5">Decision Factor Breakdown:</span>
+                            <div id="reasonsList" class="flex flex-wrap gap-2"></div>
                         </div>
                     </div>
                 </div>
@@ -258,13 +250,13 @@
             <!-- RIGHT: Charts & Model Metrics (5 Cols) -->
             <div class="lg:col-span-5 space-y-6">
                 <!-- Decision Breakdown Chart -->
-                <div class="bg-cardBg border border-borderBg rounded-xl p-5 shadow-xl">
+                <div class="bg-cardBg border border-borderBg rounded-xl p-5 shadow-sm">
                     <div class="flex items-center justify-between mb-3">
-                        <h3 class="text-sm font-bold text-white flex items-center gap-2">
-                            <i data-lucide="pie-chart" class="w-4 h-4 text-indigo-400"></i>
+                        <h3 class="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                            <i data-lucide="pie-chart" class="w-3.5 h-3.5 text-indigo-400"></i>
                             Decision Breakdown
                         </h3>
-                        <span class="text-[11px] text-slate-400">Approve / Flag / Block</span>
+                        <span class="text-[11px] text-slate-400">Status Distribution</span>
                     </div>
                     <div class="h-48 relative flex items-center justify-center">
                         <canvas id="decisionChart"></canvas>
@@ -272,10 +264,10 @@
                 </div>
 
                 <!-- Risk Distribution Histogram -->
-                <div class="bg-cardBg border border-borderBg rounded-xl p-5 shadow-xl">
+                <div class="bg-cardBg border border-borderBg rounded-xl p-5 shadow-sm">
                     <div class="flex items-center justify-between mb-3">
-                        <h3 class="text-sm font-bold text-white flex items-center gap-2">
-                            <i data-lucide="bar-chart-3" class="w-4 h-4 text-indigo-400"></i>
+                        <h3 class="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                            <i data-lucide="bar-chart-2" class="w-3.5 h-3.5 text-indigo-400"></i>
                             Risk Score Distribution
                         </h3>
                         <span class="text-[11px] text-slate-400">Probability Buckets</span>
@@ -286,9 +278,9 @@
                 </div>
 
                 <!-- Model Performance Card -->
-                <div id="modelMetricsCard" class="bg-cardBg border border-borderBg rounded-xl p-5 shadow-xl space-y-3">
-                    <h3 class="text-sm font-bold text-white flex items-center gap-2">
-                        <i data-lucide="cpu" class="w-4 h-4 text-indigo-400"></i>
+                <div id="modelMetricsCard" class="bg-cardBg border border-borderBg rounded-xl p-5 shadow-sm space-y-3">
+                    <h3 class="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                        <i data-lucide="cpu" class="w-3.5 h-3.5 text-indigo-400"></i>
                         Active Model Benchmark
                     </h3>
                     <div class="grid grid-cols-3 gap-2 text-center text-xs">
@@ -311,11 +303,11 @@
         </section>
 
         <!-- Transaction Audit Log Table -->
-        <section class="bg-cardBg border border-borderBg rounded-xl p-6 shadow-xl space-y-4">
+        <section class="bg-cardBg border border-borderBg rounded-xl p-6 shadow-sm space-y-4">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div class="flex items-center space-x-2">
-                    <i data-lucide="list" class="w-5 h-5 text-indigo-400"></i>
-                    <h2 class="text-base font-bold text-white">Live Transaction Audit Log</h2>
+                    <i data-lucide="list" class="w-4 h-4 text-indigo-400"></i>
+                    <h2 class="text-sm font-bold text-white uppercase tracking-wider">Transaction Audit Log</h2>
                 </div>
 
                 <!-- Filters -->
@@ -333,7 +325,7 @@
                     </select>
 
                     <button onclick="fetchAuditLog()" class="p-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg border border-slate-700 transition" title="Refresh Log">
-                        <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+                        <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
                     </button>
                 </div>
             </div>
@@ -346,9 +338,9 @@
                             <th class="py-3 px-4">Timestamp</th>
                             <th class="py-3 px-4">Transaction ID</th>
                             <th class="py-3 px-4">Type</th>
-                            <th class="py-3 px-4">Amount ($)</th>
+                            <th class="py-3 px-4">Amount</th>
                             <th class="py-3 px-4">Sender &rarr; Receiver</th>
-                            <th class="py-3 px-4">Fraud Risk Score</th>
+                            <th class="py-3 px-4">Risk Probability</th>
                             <th class="py-3 px-4">Decision</th>
                         </tr>
                     </thead>
@@ -363,7 +355,6 @@
 
     </main>
 
-    <!-- App JS -->
     <script src="/static/js/app.js"></script>
     <script>
         lucide.createIcons();

@@ -32,9 +32,7 @@ def generate_financial_dataset(n_samples: int = 25000, fraud_ratio: float = 0.02
 
     records = []
 
-    # -------------------------------------------------------------
-    # 1. GENERATE LEGITIMATE TRANSACTIONS
-    # -------------------------------------------------------------
+    # 1. Generate Legitimate Transactions
     types_legit = ['PAYMENT', 'CASH_OUT', 'TRANSFER', 'CASH_IN', 'DEBIT']
     weights_legit = [0.40, 0.25, 0.15, 0.15, 0.05]
 
@@ -42,7 +40,6 @@ def generate_financial_dataset(n_samples: int = 25000, fraud_ratio: float = 0.02
         step = int(np.random.randint(1, 720))
         hour_of_day = step % 24
         
-        # Most legit transactions happen during daytime (8 AM - 10 PM)
         if hour_of_day < 6 or hour_of_day > 23:
             if np.random.rand() > 0.3:
                 step = (step // 24) * 24 + int(np.random.randint(8, 21))
@@ -103,15 +100,11 @@ def generate_financial_dataset(n_samples: int = 25000, fraud_ratio: float = 0.02
             'isFraud': 0
         })
 
-    # -------------------------------------------------------------
-    # 2. GENERATE FRAUDULENT TRANSACTIONS
-    # Fraud patterns (Account Takeovers, Balance Draining, Shell Accounts)
-    # -------------------------------------------------------------
+    # 2. Generate Fraudulent Transactions
     fraud_types = ['TRANSFER', 'CASH_OUT']
 
     for _ in range(n_fraud):
         step = int(np.random.randint(1, 720))
-        # High occurrence in late hours / abnormal times (1 AM - 5 AM)
         if np.random.rand() > 0.4:
             step = (step // 24) * 24 + int(np.random.randint(1, 6))
 
@@ -119,21 +112,18 @@ def generate_financial_dataset(n_samples: int = 25000, fraud_ratio: float = 0.02
         orig_id = f"C{np.random.randint(1000000, 9999999)}"
         dest_id = f"C{np.random.randint(1000000, 9999999)}"
 
-        # Fraud Pattern A: Completely draining the origin account balance
         if np.random.rand() > 0.35:
             amount = round(float(np.random.uniform(5000, 250000)), 2)
-            oldbalance_orig = amount  # Entire balance drained
+            oldbalance_orig = amount
             newbalance_orig = 0.0
-            oldbalance_dest = 0.0     # Newly created mule / shell account
-            newbalance_dest = 0.0     # Funds rapidly moved out or masked
-        
-        # Fraud Pattern B: Discrepancy where amount > balance or balances don't match
+            oldbalance_dest = 0.0
+            newbalance_dest = 0.0
         else:
             amount = round(float(np.random.uniform(20000, 500000)), 2)
             oldbalance_orig = round(float(amount * np.random.uniform(0.7, 1.0)), 2)
             newbalance_orig = 0.0
             oldbalance_dest = round(float(np.random.uniform(0, 1000)), 2)
-            newbalance_dest = oldbalance_dest  # Suspicious: destination balance didn't record addition
+            newbalance_dest = oldbalance_dest
 
         records.append({
             'step': step,
@@ -149,7 +139,6 @@ def generate_financial_dataset(n_samples: int = 25000, fraud_ratio: float = 0.02
         })
 
     df = pd.DataFrame(records)
-    # Shuffle the dataset
     df = df.sample(frac=1.0, random_state=random_state).reset_index(drop=True)
     return df
 
@@ -159,18 +148,18 @@ def ensure_dataset(data_path: str = "data/raw/transactions.csv", n_samples: int 
     Checks if dataset exists; if not, creates the directory and generates the dataset.
     """
     if os.path.exists(data_path):
-        print(f"📦 Loading existing dataset from {data_path}")
+        print(f"[DATA] Loading existing dataset from {data_path}")
         df = pd.read_csv(data_path)
     else:
-        print(f"⚙️ Generating synthetic dataset ({n_samples} transactions) at {data_path}...")
+        print(f"[DATA] Generating synthetic transaction dataset ({n_samples} records) at {data_path}...")
         os.makedirs(os.path.dirname(data_path), exist_ok=True)
         df = generate_financial_dataset(n_samples=n_samples)
         df.to_csv(data_path, index=False)
-        print(f"✅ Dataset generated and saved to {data_path}")
+        print(f"[DATA] Dataset successfully generated and saved to {data_path}")
 
     fraud_count = int(df['isFraud'].sum())
     total_count = len(df)
-    print(f"📊 Total Records: {total_count:,} | Legitimate: {total_count - fraud_count:,} | Fraud: {fraud_count:,} ({fraud_count/total_count*100:.2f}%)")
+    print(f"[DATA] Total Records: {total_count:,} | Legitimate: {total_count - fraud_count:,} | Fraud: {fraud_count:,} ({fraud_count/total_count*100:.2f}%)")
     return df
 
 

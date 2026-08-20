@@ -1,11 +1,11 @@
 /**
- * Sentinel AI Fraud Detection Platform - Dashboard Client
+ * Sentinel Financial Fraud Detection Platform - Dashboard Client
  */
 
 let decisionChartInstance = null;
 let riskDistChartInstance = null;
 
-// Preset Scenarios for Quick Testing
+// Preset Scenarios for Testing
 const PRESETS = {
     coffee: {
         type: 'PAYMENT',
@@ -67,14 +67,12 @@ function loadPreset(key) {
     document.getElementById('formDestId').value = p.destId;
 }
 
-// -------------------------------------------------------------
 // Form Submission & Live Prediction
-// -------------------------------------------------------------
 document.getElementById('txnForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     const btn = document.getElementById('submitBtn');
     btn.disabled = true;
-    btn.innerHTML = `<span>Scoring with AI Model...</span>`;
+    btn.innerHTML = `<span>Evaluating Risk...</span>`;
 
     const payload = {
         type: document.getElementById('formType').value,
@@ -102,14 +100,13 @@ document.getElementById('txnForm').addEventListener('submit', async (e) => {
         const data = await response.json();
         displayPredictionResult(data);
         
-        // Refresh analytics and audit log
         fetchAnalytics();
         fetchAuditLog();
     } catch (err) {
-        alert(`Error evaluating transaction: ${err.message}`);
+        alert(`Evaluation error: ${err.message}`);
     } finally {
         btn.disabled = false;
-        btn.innerHTML = `<i data-lucide="zap" class="w-4 h-4"></i><span>Evaluate Transaction Risk</span>`;
+        btn.innerHTML = `<i data-lucide="shield" class="w-4 h-4"></i><span>Evaluate Transaction</span>`;
         lucide.createIcons();
     }
 });
@@ -123,7 +120,7 @@ function displayPredictionResult(res) {
     const reasonsList = document.getElementById('reasonsList');
 
     box.classList.remove('hidden', 'result-glow-approve', 'result-glow-flag', 'result-glow-block');
-    badge.className = 'px-4 py-1.5 rounded-full text-xs font-extrabold tracking-wider border';
+    badge.className = 'px-4 py-1.5 rounded-full text-xs font-bold tracking-wider border';
 
     txnId.textContent = res.transaction_id;
     riskText.textContent = res.risk_percentage;
@@ -131,30 +128,28 @@ function displayPredictionResult(res) {
     const riskVal = res.risk_score * 100;
     bar.style.width = `${riskVal}%`;
 
-    // Apply color themes
     if (res.decision === 'APPROVE') {
         box.classList.add('result-glow-approve', 'bg-emerald-950/20', 'border-emerald-800/40');
         badge.classList.add('badge-approve');
-        badge.textContent = '✅ APPROVED';
+        badge.textContent = 'APPROVED';
         bar.className = 'h-full rounded-full transition-all duration-500 bg-emerald-500';
     } else if (res.decision === 'FLAG') {
         box.classList.add('result-glow-flag', 'bg-amber-950/20', 'border-amber-800/40');
         badge.classList.add('badge-flag');
-        badge.textContent = '⚠️ FLAGGED (MFA)';
+        badge.textContent = 'FLAGGED (MFA REQUIRED)';
         bar.className = 'h-full rounded-full transition-all duration-500 bg-amber-500';
     } else {
         box.classList.add('result-glow-block', 'bg-rose-950/20', 'border-rose-800/40');
         badge.classList.add('badge-block');
-        badge.textContent = '🚨 BLOCKED';
+        badge.textContent = 'BLOCKED';
         bar.className = 'h-full rounded-full transition-all duration-500 bg-rose-500';
     }
 
-    // Explanations
     reasonsList.innerHTML = '';
     if (res.flag_reasons && res.flag_reasons.length > 0) {
         res.flag_reasons.forEach(reason => {
             const tag = document.createElement('span');
-            tag.className = 'text-[11px] px-2.5 py-1 rounded-md bg-slate-800 border border-slate-700 text-slate-300 flex items-center gap-1';
+            tag.className = 'text-[11px] px-2.5 py-1 rounded-md bg-slate-800 border border-slate-700 text-slate-300 flex items-center gap-1.5';
             tag.innerHTML = `<i data-lucide="info" class="w-3 h-3 text-indigo-400"></i> ${reason}`;
             reasonsList.appendChild(tag);
         });
@@ -162,23 +157,19 @@ function displayPredictionResult(res) {
     lucide.createIcons();
 }
 
-// -------------------------------------------------------------
 // Fetch Analytics & Update Charts
-// -------------------------------------------------------------
 async function fetchAnalytics() {
     try {
         const res = await fetch('/api/v1/analytics');
         if (!res.ok) return;
         const data = await res.json();
 
-        // Update KPIs
         document.getElementById('kpiTotal').textContent = data.total_transactions.toLocaleString();
         document.getElementById('kpiApproved').textContent = data.total_approved.toLocaleString();
         document.getElementById('kpiFlagged').textContent = data.total_flagged.toLocaleString();
         document.getElementById('kpiBlocked').textContent = data.total_blocked.toLocaleString();
         document.getElementById('kpiFraudRate').textContent = `Fraud Rate: ${data.fraud_rate_percentage}%`;
 
-        // Update Model Info
         if (data.model_metadata) {
             const meta = data.model_metadata;
             document.getElementById('activeModelName').textContent = `Model: ${meta.selected_model}`;
@@ -189,7 +180,6 @@ async function fetchAnalytics() {
             }
         }
 
-        // Render / Update Charts
         renderDecisionChart(data.total_approved, data.total_flagged, data.total_blocked);
         renderRiskDistChart(data.risk_distribution);
 
@@ -201,8 +191,6 @@ async function fetchAnalytics() {
 function renderDecisionChart(approved, flagged, blocked) {
     const ctx = document.getElementById('decisionChart').getContext('2d');
     const chartData = [approved, flagged, blocked];
-    
-    // Default dummy data if empty
     const displayData = (approved + flagged + blocked === 0) ? [1, 0, 0] : chartData;
 
     if (decisionChartInstance) {
@@ -238,7 +226,6 @@ function renderDecisionChart(approved, flagged, blocked) {
 
 function renderRiskDistChart(dist) {
     const ctx = document.getElementById('riskDistributionChart').getContext('2d');
-    const labels = Object.keys(dist);
     const counts = Object.values(dist);
 
     if (riskDistChartInstance) {
@@ -272,9 +259,7 @@ function renderRiskDistChart(dist) {
     });
 }
 
-// -------------------------------------------------------------
 // Transaction Audit Log Table
-// -------------------------------------------------------------
 async function fetchAuditLog() {
     const filter = document.getElementById('filterDecision').value;
     const search = document.getElementById('searchInput').value;
@@ -338,14 +323,12 @@ async function fetchAuditLog() {
     }
 }
 
-// Event Listeners for Filters
 document.getElementById('filterDecision').addEventListener('change', fetchAuditLog);
 document.getElementById('searchInput').addEventListener('input', () => {
     clearTimeout(window.searchTimeout);
     window.searchTimeout = setTimeout(fetchAuditLog, 300);
 });
 
-// Initial Page Load
 window.addEventListener('DOMContentLoaded', () => {
     fetchAnalytics();
     fetchAuditLog();

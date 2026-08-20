@@ -28,7 +28,7 @@ def train_and_benchmark(data_path: str = "data/raw/transactions.csv", artifacts_
     """
     os.makedirs(artifacts_dir, exist_ok=True)
 
-    print("\n🚀 STEP 1: Loading & Inspecting Dataset...")
+    print("\n[TRAIN] Step 1: Loading and inspecting dataset...")
     df = ensure_dataset(data_path=data_path)
 
     # Features and Target
@@ -40,7 +40,7 @@ def train_and_benchmark(data_path: str = "data/raw/transactions.csv", artifacts_
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=0.20, random_state=42, stratify=y
     )
-    print(f"📊 Training Set: {len(X_train):,} rows | Test Set: {len(X_test):,} rows")
+    print(f"[DATA] Training split: {len(X_train):,} rows | Test split: {len(X_test):,} rows")
 
     # Define Candidate Models
     models = {
@@ -70,52 +70,44 @@ def train_and_benchmark(data_path: str = "data/raw/transactions.csv", artifacts_
     best_name = ""
     best_metrics = {}
 
-    print("\n🚀 STEP 2: Training & Benchmarking Models...")
+    print("\n[TRAIN] Step 2: Training and benchmarking candidate models...")
 
     for name, clf in models.items():
-        print(f"\n🔄 Training {name}...")
+        print(f"[TRAIN] Fitting {name}...")
         
-        # Assemble complete end-to-end pipeline (Feature Extraction + Preprocessing + Classifier)
         pipeline = Pipeline([
             ('preprocessor', build_preprocessor()),
             ('classifier', clf)
         ])
 
-        # Train pipeline
         pipeline.fit(X_train, y_train)
 
-        # Evaluate on unseen test data
         metrics = evaluate_model(pipeline, X_test, y_test, model_name=name, threshold=0.5)
         print_evaluation_summary(metrics)
         results.append(metrics)
 
-        # Track best model by F1-Score (balances precision and recall)
         if metrics["f1_score"] > best_f1:
             best_f1 = metrics["f1_score"]
             best_pipeline = pipeline
             best_name = name
             best_metrics = metrics
 
-    # -------------------------------------------------------------
-    # 3. PRINT COMPARISON LEADERBOARD
-    # -------------------------------------------------------------
+    # Print Leaderboard
     print("\n=======================================================")
-    print("🏆 MODEL BENCHMARK LEADERBOARD")
+    print("MODEL BENCHMARK LEADERBOARD")
     print("=======================================================")
     print(f"{'Model':<32} | {'F1-Score':<8} | {'Recall':<8} | {'Precision':<10} | {'ROC-AUC':<8}")
     print("-" * 75)
     for r in sorted(results, key=lambda x: x["f1_score"], reverse=True):
         print(f"{r['model_name']:<32} | {r['f1_score']:<8.4f} | {r['recall']*100:<7.2f}% | {r['precision']*100:<9.2f}% | {r['roc_auc']:<8.4f}")
     print("=======================================================")
-    print(f"✨ SELECTED BEST MODEL: {best_name} (F1 = {best_f1:.4f})")
+    print(f"[RESULT] Selected best model: {best_name} (F1 = {best_f1:.4f})")
 
-    # -------------------------------------------------------------
-    # 4. SAVE ARTIFACTS
-    # -------------------------------------------------------------
+    # Save Artifacts
     model_path = os.path.join(artifacts_dir, "best_model.joblib")
     metrics_path = os.path.join(artifacts_dir, "metrics.json")
 
-    print(f"\n💾 Saving winning model to {model_path}...")
+    print(f"[SAVE] Serializing model pipeline to {model_path}...")
     joblib.dump(best_pipeline, model_path)
 
     metadata = {
@@ -133,8 +125,8 @@ def train_and_benchmark(data_path: str = "data/raw/transactions.csv", artifacts_
     with open(metrics_path, "w") as f:
         json.dump(metadata, f, indent=2)
 
-    print(f"✅ Metadata saved to {metrics_path}")
-    print(f"🎉 ML Training Phase Complete!\n")
+    print(f"[SAVE] Model metadata saved to {metrics_path}")
+    print("[COMPLETE] ML training pipeline completed successfully.\n")
     return best_pipeline, metadata
 
 

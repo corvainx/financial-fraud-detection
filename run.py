@@ -1,5 +1,5 @@
 """
-All-in-One Application Launcher for Sentinel AI Fraud Detection Platform.
+Application Launcher for Sentinel AI Financial Fraud Detection Platform.
 
 Performs:
 1. Dataset verification & generation (if not present)
@@ -24,35 +24,34 @@ from ml.train import train_and_benchmark
 
 def bootstrap_system():
     print("\n" + "=" * 65)
-    print("🛡️  INITIALIZING SENTINEL AI FRAUD DETECTION PLATFORM")
+    print("SENTINEL: FINANCIAL FRAUD DETECTION PLATFORM")
     print("=" * 65)
 
     # 1. Check / Generate Dataset
     if not os.path.exists(settings.DATA_PATH):
-        print("\n📁 [Step 1/4] Generating realistic financial transaction dataset...")
+        print("\n[Step 1/4] Generating transaction dataset...")
         ensure_dataset(data_path=settings.DATA_PATH, n_samples=25000)
     else:
-        print(f"\n📁 [Step 1/4] Transaction dataset verified at {settings.DATA_PATH}")
+        print(f"\n[Step 1/4] Transaction dataset verified at {settings.DATA_PATH}")
 
     # 2. Check / Train ML Model
     if not os.path.exists(settings.MODEL_PATH):
-        print("\n🤖 [Step 2/4] Training & benchmarking ML models (LogReg, Random Forest, GBDT)...")
+        print("\n[Step 2/4] Benchmarking ML models (Logistic Regression, Random Forest, GBDT)...")
         train_and_benchmark(data_path=settings.DATA_PATH, artifacts_dir=os.path.dirname(settings.MODEL_PATH))
     else:
-        print(f"\n🤖 [Step 2/4] Trained ML model artifact verified at {settings.MODEL_PATH}")
+        print(f"\n[Step 2/4] Trained ML model verified at {settings.MODEL_PATH}")
 
     # 3. Initialize Database & Seed Sample Records
-    print(f"\n🗄️ [Step 3/4] Initializing Database ({settings.DATABASE_URL.split('://')[0].upper()})...")
+    print(f"\n[Step 3/4] Initializing Database ({settings.DATABASE_URL.split('://')[0].upper()})...")
     init_db()
 
     db = SessionLocal()
     try:
         count = db.query(TransactionRecord).count()
         if count == 0:
-            print("🌱 Seeding initial sample transactions into database for live dashboard...")
+            print("[Step 3/4] Seeding initial sample transactions into database...")
             engine = FraudInferenceEngine()
             
-            # Load a few sample rows from dataset to seed initial history
             df_seed = pd.read_csv(settings.DATA_PATH).head(35)
             for _, row in df_seed.iterrows():
                 txn_input = TransactionCreate(
@@ -85,16 +84,16 @@ def bootstrap_system():
                 )
                 db.add(rec)
             db.commit()
-            print("✅ 35 initial transactions successfully seeded.")
+            print("[Step 3/4] Initial sample data seeded successfully.")
         else:
-            print(f"✅ Found {count} existing transactions in database.")
+            print(f"[Step 3/4] Found {count} existing records in database.")
     finally:
         db.close()
 
-    print("\n🚀 [Step 4/4] Starting FastAPI Server & Web Dashboard...")
+    print("\n[Step 4/4] Starting FastAPI Server...")
     print("=" * 65)
-    print("🌐 Web Dashboard UI : http://127.0.0.1:8000")
-    print("📖 Swagger API Docs : http://127.0.0.1:8000/docs")
+    print("Dashboard UI     : http://127.0.0.1:8000")
+    print("API Documentation: http://127.0.0.1:8000/docs")
     print("=" * 65 + "\n")
 
 
