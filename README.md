@@ -225,3 +225,4 @@ fraud_det/
 - **Backend API**: FastAPI, Uvicorn, Pydantic
 - **Database**: SQLite (default, zero setup) / MySQL compatible via SQLAlchemy
 - **Frontend Dashboard**: HTML5, Tailwind CSS, Chart.js, Lucide Icons
+
